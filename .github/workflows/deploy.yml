@@ -24,8 +24,20 @@ jobs:
       run: |
         aws s3 cp model_dir/model.tar.gz s3://car-damage-dataset-bucket/model/model.tar.gz
 
-    - name: Update SageMaker Model & Endpoint
+    - name: Create New Endpoint Config
+      run: |
+        TIMESTAMP=$(date +%s)
+        NEW_CONFIG_NAME=car-damage-infer-config-$TIMESTAMP
+
+        aws sagemaker create-endpoint-config \
+          --endpoint-config-name $NEW_CONFIG_NAME \
+          --production-variants VariantName=AllTraffic,ModelName=car-damage-final-infer-model,InitialInstanceCount=1,InstanceType=ml.m5.large
+
+        echo "NEW_CONFIG_NAME=$NEW_CONFIG_NAME" >> $GITHUB_ENV
+
+    - name: Update SageMaker Endpoint
       run: |
         aws sagemaker update-endpoint \
           --endpoint-name car-damage-final-infer-endpoint \
-          --endpoint-config-name car-damage-final-infer-endpoint-config
+          --endpoint-config-name ${{ env.NEW_CONFIG_NAME }}
+
