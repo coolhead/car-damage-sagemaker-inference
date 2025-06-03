@@ -19,7 +19,7 @@ car-damage-pipeline/
 ├── predict.py                 # Script to invoke the SageMaker endpoint
 ├── config/config.yaml         # Configuration file (optional)
 ├── .github/workflows/
-│   └── deploy.yml             # GitHub Actions CI/CD pipeline (To Be Added)
+│   └── deploy.yml             # GitHub Actions CI/CD pipeline 
 └── README.md                  # Project documentation
 ```
 
