@@ -1,0 +1,31 @@
+name: Deploy Model to SageMaker
+
+on:
+  push:
+    paths:
+      - 'model_dir/model.tar.gz'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-south-1
+
+    - name: Upload Model to S3
+      run: |
+        aws s3 cp model_dir/model.tar.gz s3://car-damage-dataset-bucket/model/model.tar.gz
+
+    - name: Update SageMaker Model & Endpoint
+      run: |
+        aws sagemaker update-endpoint \
+          --endpoint-name car-damage-final-infer-endpoint \
+          --endpoint-config-name car-damage-final-infer-endpoint-config
